@@ -2,7 +2,7 @@ from aiogram import Bot, Dispatcher, types, filters
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 import asyncio, logging, sys
 
-TOKEN = "8422440023:AAGtrYibSEecSiJWgQs-a0TbpHLgXZI9CiE"
+TOKEN = "8147952177:AAEsR2ejafoKVb_OFcm6rEJAzUt_BKiOr5A"
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
