@@ -1,0 +1,8 @@
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    container_name: horeca_360_bot
+    restart: always
+    command: python3 main.py
