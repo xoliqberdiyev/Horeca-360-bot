@@ -6,30 +6,64 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
 TOKEN = "8147952177:AAEsR2ejafoKVb_OFcm6rEJAzUt_BKiOr5A"
-
+# TOKEN = '7060272362:AAE2-q9smV-mr0oaMvKz-Hjt1kBet8JebuM'
+BACKEND_URL = 'https://horeca.felixits.uz/'
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 class CodeStates(StatesGroup):
-    product_code = State()
+    phone = State()
+    full_name = State()
 
 
 @dp.message(filters.CommandStart())
 async def start_handler(message: types.Message, state: FSMContext):
-    await message.answer("Assalomu alaykum! Iltimos, mahsulot kodni kiriting:")
-    await state.set_state(CodeStates.product_code)
+    url = f"{BACKEND_URL}/api/v1/orders/supplier/{message.from_user.id}/"
+    res = requests.get(url)
+    if res.status_code == 404:
+        keyboard = ReplyKeyboardMarkup(
+            keyboard=[
+                [KeyboardButton(text="📞 Telefon raqamni yuborish", request_contact=True)]
+            ],
+            resize_keyboard=True,
+            one_time_keyboard=True
+        )
+
+        await message.answer(
+            "Assalomu alaykum! Iltimos, telefon raqamingizni yuboring:",
+            reply_markup=keyboard
+        )
+        await state.set_state(CodeStates.phone)
+    else:
+        await message.answer("Salom")
+        await state.clear()
 
 
-@dp.message(CodeStates.product_code)
+@dp.message(CodeStates.phone)
 async def get_code(message: types.Message, state: FSMContext):
-    code = message.text
-    await state.clear()
-    url = f'https://horeca.felixits.uz/api/v1/products/set_tg_id/{code}/'
-    res = requests.post(url, data={'tg_id': message.from_user.id})
+    phone = message.contact.phone_number
+    await state.update_data(phone=phone)
+    await message.answer('Ims Familiyangizni kirting:')
+    await state.set_state(CodeStates.full_name)
+
+
+@dp.message(CodeStates.full_name)
+async def get_code(message: types.Message, state: FSMContext):
+    full_name = message.text
+    await state.update_data(full_name=full_name)
+    url = f'{BACKEND_URL}/api/v1/orders/supplier/create/'
+    data = await state.get_data()
+    body = {
+        'phone': data.get('phone'),
+        'full_name': data.get('full_name'),
+        'tg_id': message.from_user.id
+    }
+    res = requests.post(url, data=body)
     if res.status_code == 200:
         await message.answer("Raxmat")
+        await state.clear()
     else:
-        await message.answer("Mahsulot topilmadi, qayta urinib koring")
+        await message.answer(res.json())
 
 
 @dp.message(filters.Command(commands=['web_app']))
