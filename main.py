@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 
 TOKEN = "8147952177:AAEsR2ejafoKVb_OFcm6rEJAzUt_BKiOr5A"
 # TOKEN = '7060272362:AAE2-q9smV-mr0oaMvKz-Hjt1kBet8JebuM'
-BACKEND_URL = 'https://horeca.felixits.uz/'
+BACKEND_URL = 'https://agro.felixits.uz/'
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
