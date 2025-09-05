@@ -5,8 +5,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
-TOKEN = "8147952177:AAEsR2ejafoKVb_OFcm6rEJAzUt_BKiOr5A"
-# TOKEN = '7060272362:AAE2-q9smV-mr0oaMvKz-Hjt1kBet8JebuM'
+TOKEN = "7003564044:AAE4R5Nk-E74hOno932iJINNPW3YRjjH8Mo"
 BACKEND_URL = 'https://agro.felixits.uz/'
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
