@@ -71,7 +71,7 @@ async def start_handler(message: types.Message):
         keyboard=[
             [KeyboardButton(
                 text="Open",
-                web_app=WebAppInfo(url="https://agro360.vercel.app")
+                web_app=WebAppInfo(url="https://agro365.vercel.app")
             )]
         ],
         resize_keyboard=True
