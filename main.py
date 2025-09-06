@@ -5,17 +5,21 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
-TOKEN = "8043593409:AAEC4GfxOyfv9LmbfLiwU7_g-mdtuj3y8rI"
-BACKEND_URL = 'https://agro.felixits.uz/'
-bot = Bot(token=TOKEN)
-dp = Dispatcher()
+TOKEN1 = "7003564044:AAE4R5Nk-E74hOno932iJINNPW3YRjjH8Mo" # web app
+TOKEN2 = "8043593409:AAEC4GfxOyfv9LmbfLiwU7_g-mdtuj3y8rI" # delivery
+
+BACKEND_URL = 'http://localhost:8080/'
+bot1 = Bot(token=TOKEN1)
+bot2 = Bot(token=TOKEN2)
+dp1 = Dispatcher()
+dp2 = Dispatcher()
 
 class CodeStates(StatesGroup):
     phone = State()
     full_name = State()
 
 
-@dp.message(filters.CommandStart())
+@dp2.message(filters.CommandStart())
 async def start_handler(message: types.Message, state: FSMContext):
     url = f"{BACKEND_URL}/api/v1/orders/supplier/{message.from_user.id}/"
     res = requests.get(url)
@@ -38,7 +42,7 @@ async def start_handler(message: types.Message, state: FSMContext):
         await state.clear()
 
 
-@dp.message(CodeStates.phone)
+@dp2.message(CodeStates.phone)
 async def get_code(message: types.Message, state: FSMContext):
     phone = message.contact.phone_number
     await state.update_data(phone=phone)
@@ -46,7 +50,7 @@ async def get_code(message: types.Message, state: FSMContext):
     await state.set_state(CodeStates.full_name)
 
 
-@dp.message(CodeStates.full_name)
+@dp2.message(CodeStates.full_name)
 async def get_code(message: types.Message, state: FSMContext):
     full_name = message.text
     await state.update_data(full_name=full_name)
@@ -65,7 +69,7 @@ async def get_code(message: types.Message, state: FSMContext):
         await message.answer(res.json())
 
 
-@dp.message(filters.Command(commands=['web_app']))
+@dp1.message(filters.Command(commands=['web_app']))
 async def start_handler(message: types.Message):
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
@@ -79,7 +83,10 @@ async def start_handler(message: types.Message):
     await message.answer("Salom! Web Appni ochish uchun tugmani bosing 👇", reply_markup=keyboard)
 
 async def main():
-    await dp.start_polling(bot)
+    await asyncio.gather(
+        dp1.start_polling(bot1),
+        dp2.start_polling(bot2),
+    )
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
