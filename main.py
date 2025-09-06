@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 TOKEN1 = "7003564044:AAE4R5Nk-E74hOno932iJINNPW3YRjjH8Mo" # web app
 TOKEN2 = "8043593409:AAEC4GfxOyfv9LmbfLiwU7_g-mdtuj3y8rI" # delivery
 
-BACKEND_URL = 'http://localhost:8080/'
+BACKEND_URL = 'https://agro.felixits.uz'
 bot1 = Bot(token=TOKEN1)
 bot2 = Bot(token=TOKEN2)
 dp1 = Dispatcher()
