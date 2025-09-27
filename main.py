@@ -4,11 +4,15 @@ from aiogram import Bot, Dispatcher, types, filters
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
+from dotenv import load_dotenv
 
-TOKEN1 = "7003564044:AAE4R5Nk-E74hOno932iJINNPW3YRjjH8Mo" # web app
-TOKEN2 = "8043593409:AAEC4GfxOyfv9LmbfLiwU7_g-mdtuj3y8rI" # delivery
+load_dotenv()
 
-BACKEND_URL = 'https://agro.felixits.uz'
+TOKEN1 = os.getenv("TOKEN1")
+TOKEN2 = os.getenv("TOKEN2")
+BACKEND_URL = os.getenv("BACKEND_URL")
+ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))  
+
 bot1 = Bot(token=TOKEN1)
 bot2 = Bot(token=TOKEN2)
 dp1 = Dispatcher()
@@ -17,6 +21,10 @@ dp2 = Dispatcher()
 class CodeStates(StatesGroup):
     phone = State()
     full_name = State()
+
+class Broadcast(StatesGroup):
+    waiting_for_message = State()
+
 
 
 @dp2.message(filters.CommandStart())
@@ -81,6 +89,36 @@ async def start_handler(message: types.Message):
         resize_keyboard=True
     )
     await message.answer("Salom! Web Appni ochish uchun tugmani bosing 👇", reply_markup=keyboard)
+
+
+@dp1.message(filters.Command("send"))
+async def start_broadcast(message: types.Message, state: FSMContext):
+    if message.from_user.id != ADMIN_ID:
+        return await message.answer("❌ Sizda ruxsat yo‘q")
+
+    await message.answer("Yubormoqchi bo‘lgan xabaringizni kiriting:")
+    await state.set_state(Broadcast.waiting_for_message)
+
+
+@dp1.message(Broadcast.waiting_for_message)
+async def broadcast_message(message: types.Message, state: FSMContext):
+    msg = message.text
+    count = 0
+    url = f'{BACKEND_URL}/api/v1/accounts/user/list/'
+    res = requests.get(url)
+    for chat_id in res.json():
+        if chat_id['tg_id'] == ADMIN_ID:
+            continue
+        try:
+            await bot1.send_message(chat_id['tg_id'], msg)
+            count += 1
+        except Exception as e:
+            print(f"Xato {chat_id['tg_id']}: {e}")
+
+    await message.answer(f"✅ {count} ta foydalanuvchiga yuborildi")
+    await state.clear()
+
+
 
 async def main():
     await asyncio.gather(
