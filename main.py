@@ -121,6 +121,9 @@ async def broadcast_message(message: types.Message, state: FSMContext):
 
 
 async def main():
+    await bot1.delete_webhook(drop_pending_updates=True)
+    await bot2.delete_webhook(drop_pending_updates=True)
+    
     await asyncio.gather(
         dp1.start_polling(bot1),
         dp2.start_polling(bot2),
