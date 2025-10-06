@@ -54,7 +54,7 @@ async def start_handler(message: types.Message, state: FSMContext):
 async def get_code(message: types.Message, state: FSMContext):
     phone = message.contact.phone_number
     await state.update_data(phone=phone)
-    await message.answer('Ims Familiyangizni kirting:')
+    await message.answer('Ism Familiyangizni kirting:')
     await state.set_state(CodeStates.full_name)
 
 
